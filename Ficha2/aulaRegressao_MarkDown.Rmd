@@ -1,0 +1,38 @@
+---
+title: "AulaRegressao"
+author: "CNLF"
+date: "25/10/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+
+```{r regressao, message=TRUE, warning=TRUE, paged.print=TRUE}
+
+library(readxl)
+Ficha2dados <- read_excel("Documents/GitHub/Analise-de-Clusters/Ficha2/Ficha2dados.xlsx", sheet = "4")
+View(Ficha2dados)
+
+qi=Ficha2dados$Q.I.
+horas=Ficha2dados$Horas
+res=Ficha2dados$Resultado
+
+lm(res~horas+qi)  #coeficientes de regressão
+summary(lm(res~horas+qi))
+
+
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
