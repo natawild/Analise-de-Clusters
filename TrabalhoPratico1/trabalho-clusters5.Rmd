@@ -1,0 +1,439 @@
+---
+title: "Real State Sample - Análise de Clusters"
+date: 15 de novembro de 2019
+author: "Grupo 4"
+output: html_document
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+A base de dados utilizada neste trabalho é uma amostra aleatória de 1200 casas situadas em Saratoga, New York. Estão envolvidas 13 variáveis, 10 são variáveis numéricas, como o preço da casa, o tamanho do lote, a idade da casa, a condição, a área útil da casa, o número de casas de banho privadas e de serviço, o número de quartos e o número de lareiras. As variáveis são 3, se é perto do mar, se tem aquecimento central e o tipo de combustível utilizado na casa 
+
+```{r int, include=FALSE}
+library(readr)
+DadosTP <- read_delim("~/Documents/GitHub/Analise-de-Clusters/TrabalhoPratico1/real_estate_alterado.xlsx", "\t", escape_double = FALSE, trim_ws = TRUE)
+View(DadosTP)
+
+
+#library(readxl)
+#DadosTP <- read_excel("C:/Users/RP/Downloads/real_estate_alterado.xlsx")
+#View(DadosTP)
+```
+
+# Descrição das variáveis envolvidas 
+
+#### **Variável dependente**
+Uma variável dependente é uma medida que dependerá do valor de outra ou outras medidas variáveis. Na base de dados apresentada o preço de venda das casas é considerada a variável dependente, uma vez que depende das restantes variáveis. Esta é uma variável quantitativa discreta. 
+```{r var dependente }
+#variável dependente 
+preco<-DadosTP$`Sale Price`
+```
+
+#### **Variáveis independentes** 
+Uma variável indenpendente é uma medida que não depende de nenhuma outra medida. Uma vez que se tem 12 variáveis deste tipo, fez-se uma tabela em que estão discriminados os tipos de cada variável. 
+
+Variáveis Quantitativas   
+discretas: idade, areacasa, wcprivado, wcservico, quartos, lareira, uni, condicao
+contínuas: tamanholote
+
+Variáveis Qualitativas 
+Nominais: arcentral, tipocombustivel, agua
+Nºao existem variáveis ordinais 
+
+
+
+```{r var independente }
+#variáveis independentes 
+
+agua<-DadosTP$Waterfront  
+idade<-DadosTP$Age 
+arcentral<-DadosTP$`Central Air` 
+tipocombustivel <- DadosTP$`Fuel Type`
+areacasa<-DadosTP$`Living Area`
+wcprivado<-DadosTP$wcprivado_agre
+wcservico<-DadosTP$`Half Baths`
+quartos<-DadosTP$quartos_agr
+lareira<-DadosTP$lareira_agre
+
+```
+
+
+
+
+```{r criacao factor }
+#criação das variáveis como factor 
+agua.f <- factor(agua)
+arcentral.f  <- factor(arcentral)
+tipocombustivel.f <- factor(tipocombustivel)
+
+levels(agua)<-c("Yes","No")
+levels(arcentral)<-c("Yes","No")
+levels(tipocombustivel)<-c("Oil","Gas", "Electric")
+
+is.factor(tipocombustivel)
+
+# diz-nos o número de vezes que cada variável aparece 
+tabulate(agua.f)
+tabulate(arcentral.f)
+tabulate(tipocombustivel.f)
+summary(agua.f)
+summary(arcentral.f)
+summary(tipocombustivel.f)
+```
+
+
+```{r tiravalores }
+
+```
+
+# Fase Exploratória 
+
+
+### Análise da variável "agua"
+
+```{r plot agua }
+#BARPLOT preco vs AGUA
+rio <- c(2, 1198)
+barplot(rio,
+main = "Proximidade da água",
+xlab = "Número de habitações",
+ylab = "Proximidade da água",
+names.arg = c("Yes", "No"),
+col = "red",
+horiz = FALSE)
+
+
+boxplot(preco~agua, main="Boxplot Preço vs Proximidade da água", xlab = "Proximidade da água", ylab = "Preço da habitação", col.main="blue", col=(c("darkred", "darkgreen")))
+
+tapply(preco,agua,summary) 
+
+t.test(preco~agua)
+```
+
+### Análise da variável "idade"
+
+```{r plot idade  }
+#plot preco vs idadeCasa
+plot(preco, idade, main = "Preço vs Idade da casa", col.main= "red", xlab="Preço", ylab="Idade da Casa", pch=16)
+```
+
+### Análise da variável "arcentral"
+
+```{r plot ar  }
+#BARPLOT preco vs Ar central
+ar <- c(485, 715)
+barplot(ar,
+main = "Aquecimento central",
+ylab = "Número de habitações",
+xlab = "Aquecimento central",
+names.arg = c("Yes", "No"),
+col = c("darkgreen", "darkred"),
+horiz = FALSE)
+
+
+boxplot(preco~arcentral, main="Boxplot Preço vs Ar central", xlab = "Existência de ar central", ylab = "Preço da habitação", col.main="blue", col=(c("darkred", "darkgreen")))
+
+tapply(preco,arcentral,summary) 
+
+t.test(preco~arcentral)
+```
+
+### Análise da variável "tipocombustivel"
+
+```{r plot tipo comb }
+#BARPLOT preco vs fuel type
+
+comb <- c(134, 168, 894, 2, 2)
+barplot(comb,
+main = "Tipo de combustível",
+xlab = "Combustível",
+ylab = "Número de habitações",
+names.arg = c("Electric", "Gas","Oil", "Propane", "Wood"),
+col= c("darkblue", "pink","yellow","darkgreen","darkred"),
+horiz = FALSE)
+
+
+boxplot(preco~tipocombustivel, main="Boxplot Preço vs Tipos de combustível", xlab = "Tipos de combustível", ylab = "Preço da habitação", col.main="blue", col=(c("darkblue", "pink","yellow")))
+
+tapply(preco,tipocombustivel,summary) 
+
+
+```
+
+### Análise da variável "areacasa"
+
+```{r plot area }
+#plot preco vs areaCasa
+plot(preco, areacasa, main = "Preço vs Área da habitação", col.main= "red", xlab="Preço", ylab="Área da casa (square feet)", pch=16)
+```
+
+### Análise da variável "wcprivado"
+
+```{r plot wcpriv }
+
+boxplot(preco~wcprivado, main="Boxplot Preço vs Número de WCs privados", xlab = "Número de WCs privados", ylab = "Preço da habitação", col.main="blue", col=(c("darkblue", "pink","yellow","orange","darkred")))
+
+tapply(preco,wcprivado,summary) 
+
+
+```
+
+### Análise da variável "wcservico"
+
+```{r plot wcserv }
+#boxplot que relaciona o preço e as casas de banho de serviço 
+boxplot(preco~wcservico, main="Boxplot Preço vs Número de WCs de serviço", xlab = "Número de WCs de serviço", ylab = "Preço da habitação", col.main="blue", col=(c("darkred", "darkgreen")))
+
+tapply(preco,wcservico,summary) 
+
+t.test(preco~wcservico)
+
+wcserv <- c(406, 794)
+barplot(wcserv,
+main = "Número de habitações com wc de serviço",
+ylab = "Número de habitações",
+xlab = "Número de wc de serviço",
+names.arg = c("0", "1"),
+col = c("darkred", "darkgreen"), col.main="blue",
+horiz = FALSE)
+```
+
+### Análise da variável "quartos"
+
+```{r plot quartos }
+
+boxplot(preco~quartos, main="Boxplot Preço vs Número de quartos", xlab = "Número de quartos", ylab = "Preço da habitação", col.main="blue", col=(c("lightblue", "pink","yellow","orange")))
+
+tapply(preco,quartos,summary) 
+
+
+```
+
+### Análise da variável "lareira"
+
+```{r plot lareira }
+#plot preco vs lareira
+
+boxplot(preco~lareira, main="Boxplot Preço vs Número de lareiras", xlab = "Número de lareiras", ylab = "Preço da habitação", col.main="blue", col=(c("red","orange","yellow")))
+
+tapply(preco,lareira,summary) 
+```
+
+
+```{r matriz }
+library(corrplot)
+# Loira instala este package : install.packages("corrplot")
+matrix <- DadosTP[, c(3,6,8,11,12,13)]
+matrix
+
+res<- cor(matrix)
+round(res,2)
+#para criar o gráfico bonito da matriz
+corrplot(res, method = "circle")
+
+
+
+#Fim fase exploratória 
+
+```
+
+
+
+```{r stepwise, warning=TRUE}
+#Construção do modelo 
+
+library(tidyverse)
+library(caret)
+library(leaps)
+library(tidyr)
+library(dplyr)
+
+library(MASS)
+
+
+#ajuste completo do modelo 
+
+full.model <- lm (preco ~ idade + arcentral + tipocombustivel + areacasa + wcprivado + wcservico + quartos + lareira, data = DadosTP)
+summary(full.model)
+
+# modelo de regressão utilizando Stepwise
+# stepAIC(object, scope, scale = 0,
+#         direction = c("both", "backward", "forward"),
+#         trace = 1, keep = NULL, steps = 1000, use.start = FALSE,
+#         k = 2, ...)
+
+#método both 
+step.model <- stepAIC(full.model, direction = "both",
+                      trace = FALSE)
+summary(step.model)
+
+#método back
+step.modelb <- stepAIC(full.model, direction = "backward",
+                      trace = FALSE)
+summary(step.modelb)
+
+#método for
+step.modelf <- stepAIC(full.model, direction = "forward",
+                       trace = FALSE)
+summary(step.modelf)
+
+
+models <- regsubsets(preco ~ idade + arcentral +tipocombustivel+ areacasa + wcprivado + wcservico + quartos + lareira, data = DadosTP, nvmax = 9, method = "seqrep")
+summary(models)
+
+
+# Set seed 
+set.seed(123)
+# Set up repeated k-fold cross-validation
+train.control <- trainControl(method = "cv", number = 10)
+# Train the model
+step.model <- train(`Sale Price` ~., data =DadosTP,
+                    method = "leapBackward",
+                    tuneGrid = data.frame(nvmax = 1:12),
+                    trControl = train.control)
+
+# precisão do modelo - escolher o menor erro médio de previsão e MAE, R squared quanto maior melhor 
+step.model$results
+
+#melhor modelo 
+step.model$bestTune
+
+#coeficientes finais do modelo 
+coef(step.model$finalModel, 4)
+summary(step.model$finalModel)
+
+#ou
+lm(preco ~ arcentral + areacasa + wcprivado + quartos,
+   data = DadosTP)
+
+#verificar qual o que tem menor AIC
+#AIC(step.model)
+AIC(step.modelb)
+AIC(step.modelf)
+
+
+```
+
+
+O modelo acima é obtido através da utilização da função do R lm() e o resultado é obtido com a utilização da função summary() no modelo. 
+Na primeira linha dos resultados está a fórmula utilizada para analisar os dados. A fórmula contém uma variável preditora (preço) e dez variáveis de resposta (tamanholote, agua, idade, arcentral, tipocombustivel, areacasa, wcprivado, wcservico, quartos, lareira). 
+
+A linha seguinte mostra os resíduos do modelo. Os resíduos são a diferença entre os valores reais de resposta observados e os valores de resposta que o modelo previu. 
+Para saber o quão bem o modelo se ajusta aos dados deve-se procurar uma distribuição simétrica entre esses pontos no valor da média zero. 
+A distribuição dos resíduos não parece ser fortemente simétrica, uma vez que a média é de -4585.
+
+
+# Teste F- ANOVA
+
+
+H0: o modelo de regressão não é válido
+H1: o modelo de regressão é válido 
+valor p-value<0.05 --> rejeitar H0, 
+  
+  p-value=2.2e-16 --> rejeito h0, o modelo é válido 
+Multiple R-squared: 0.6582, 65,82% da variação do resultado é explicado pela variação das variáveis do modelo. 
+
+EXPLLICAR ANOVA
+
+
+
+```{r model}
+
+#guardamos em model os coeficientes do stepwise que vamos usar 
+model=lm(preco ~ arcentral + areacasa + wcprivado + quartos)
+
+summary(model)
+
+
+```
+
+
+---
+title: "Condições assumidas pelo modelo"
+
+--- 
+```{r}
+
+```
+
+Normalidade dos resíduos: os resíduos gerados pelo ajuste da reta seguem uma distribuição normal 
+Homocedasticidade: é necessário que a variância de Y seja constante para todos os valores de X
+Independência: É necessário que não exista estrutura de dependência entre os dados, para que os resíduos sejam independentes e identicamente distribuídos.
+Desta forma é necessário avaliar as suposições acima referidas através da análise de resíduos, vista gráficamente de seguida.
+
+---
+#Avaliação dos Resíduos
+--- 
+
+```{r grafico residuos}
+## Avaliando os resíduos 
+windows()
+par(mfrow=c(2,2))
+plot(model)
+
+
+
+```
+
+
+No primeiro gráfico, observam-se os resíduos em função dos valores estimados. Este gráfico é útil para observar a independência e a homocedasticidade, se os resíduos se distribuem de maneira razoavelmente aleatória e com a mesma amplitude em torno de zero. 
+
+No segundo gráfico, pode-se avaliar a normalidade dos resíduos. A linha da diagonal a tracejado representa a distribuição normal e os pontos a distribuição dos resíduos observada. Espera-se que não exista grande fuga dos pontos em relação à linha. 
+
+O terceiro gráfico pode ser avaliado de forma semelhante ao primeiro, obeservando a aleatoriedade e amplitude desta vez dos resíduos padronizados. 
+
+O último permite visualizar as distâncias de Cook das observações, uma medida que influencia a presença de outliers quando possui valor maior do que 1. 
+
+
+```{r boxplot residuos }
+
+residuals(model)
+
+summary(model$residuals)
+
+boxplot(model$residuals)
+
+
+```
+
+---
+#Testes à normalidade
+--- 
+
+---
+##One-sample Kolmogorov-Smirnov test
+---
+
+```{r ksteste}
+ks.test(model$residuals, "pnorm", mean(model$residuals), sd(model$residuals))
+
+
+```
+
+---
+##Shapiro-Wilk normality test
+---
+
+```{r shapiro test}
+
+shapiro.test(model$residuals)
+
+
+```
+
+---
+##Teste T-Student 
+---
+
+```{r t.test}
+
+
+t.test(model$residuals, mu=0, alternative = "two.sided")
+
+
+```
+
+

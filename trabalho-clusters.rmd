@@ -1,0 +1,349 @@
+---
+title: "Real State Sample - Análise de Clusters"
+author: "Grupo x"
+date: "12/11/2019"
+output: html_document
+---
+
+A base de dados utilizada neste trabalho é uma amostra aleatória de 1200 casas situadas em Saratoga, New York. Estão envolvidas 13 variáveis, 10 são variáveis numéricas, como o preço da casa, o tamanho do lote, a idade da casa, a condição, a área útil da casa, o número de casas de banho privadas e de serviço, o número de quartos e o número de lareiras. As variáveis são 3, se é perto do mar, se tem aquecimento central e o tipo de combustível utilizado na casa 
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r int }
+#library(readr)
+#DadosTP <- read_delim("C:/Users/marci.MARCIA.000/Downloads/real-estate-sample-1200.txt", 
+    #"\t", escape_double = FALSE, trim_ws = TRUE)
+#View(DadosTP)
+
+library(readr)
+DadosTP <- read_delim("~/Downloads/real-estate-sample-1200 (1).txt", 
+    "\t", escape_double = FALSE, trim_ws = TRUE)
+View(DadosTP)
+
+
+summary(DadosTP)
+
+#variável dependente 
+preco<-DadosTP$`Sale Price`
+
+
+#variáveis independentes 
+tamanholote <- DadosTP$`Lot Size`
+agua<-DadosTP$Waterfront  
+idade<-DadosTP$Age 
+arcentral<-DadosTP$`Central Air` 
+tipocombustivel <- DadosTP$`Fuel Type`
+areacasa<-DadosTP$`Living Area`
+wcprivado<-DadosTP$`Full Baths`
+wcservico<-DadosTP$`Half Baths`
+quartos<-DadosTP$Bedrooms
+lareira<-DadosTP$Fireplaces
+uni <- DadosTP$`Pct College`
+condicao <- DadosTP$Condition
+
+
+
+
+#PLOTS
+#plot preco vs tamanhodolote
+plot(preco, tamanholote,main = "Preço vs Tamanho do lote", col.main= "red", xlab="Preço", ylab="Tamanho do lote", pch=16) #ver gráfico de dispersão para o tamanho do lote
+
+#BARPLOT preco vs AGUA
+rio <- c(2, 1198)
+barplot(rio,
+main = "Proximidade da água",
+xlab = "Número de habitações",
+ylab = "Proximidade da água",
+names.arg = c("Yes", "No"),
+col = "red",
+horiz = FALSE)
+
+#plot preco vs idadeCasa
+plot(preco, idade, main = "Preço vs Idade da casa", col.main= "red", xlab="Preço", ylab="Idade da Casa", pch=16)
+
+
+#BARPLOT preco vs Ar central
+ar <- c(485, 715)
+barplot(ar,
+main = "Aquecimento central",
+ylab = "Número de habitações",
+xlab = "Aquecimento central",
+names.arg = c("Yes", "No"),
+col = c("green", "red"),
+horiz = FALSE)
+
+#BARPLOT preco vs fuel type
+
+comb <- c(134, 168, 894, 2, 2)
+barplot(comb,
+main = "Tipo de combustível",
+xlab = "Combustível",
+ylab = "Número de habitações",
+names.arg = c("Electric", "Gas","Oil", "Propane", "Wood"),
+col= c("blue", "pink","yellow","darkgreen","red"),
+horiz = FALSE)
+
+#plot preco vs areaCasa
+plot(preco, areacasa, main = "Preço vs Área da habitação", col.main= "red", xlab="Preço", ylab="Área da casa", pch=16)
+
+#plot preco vs wcprivado 
+plot(preco, wcprivado, main = "Preço vs WC Privado", col.main= "red", xlab="Preço", ylab="Número de WCs privados", pch=16)
+
+#plot preco vs wcserviço
+plot(preco, wcservico, main = "Preço vs WC Serviço", col.main= "red", xlab="Preço", ylab="Número de WCs de serviço", pch=16)
+
+wcserv <- c(406, 794)
+barplot(wcserv,
+main = "Número de habitações com wc de serviço",
+ylab = "Número de habitações",
+xlab = "Número de wc de serviço",
+names.arg = c("0", "1"),
+col = c("0", "1"),
+horiz = FALSE)
+
+
+#plot preco vs número de quartos
+plot(preco, quartos, main = "Preço vs Números de quartos", col.main= "red", xlab="Preço", ylab="Número de quartos", pch=16)
+
+#plot preco vs lareira
+plot(preco, lareira, main = "Preço vs Números de lareiras", col.main= "red", xlab="Preço", ylab="Número de lareiras", pch=16)
+
+
+#criação das variáveis como factor 
+agua.f <- factor(agua)
+arcentral.f  <- factor(arcentral)
+tipocombustivel.f <- factor(tipocombustivel)
+
+
+levels(agua)<-c("Yes","No")
+levels(arcentral)<-c("Yes","No")
+levels(tipocombustivel)<-c("Oil","Gas","Wood","Propane", "Electric")
+
+is.factor(tipocombustivel)
+
+# diz-nos o número de vezes que cada variável aparece 
+tabulate(agua.f)
+tabulate(arcentral.f)
+tabulate(tipocombustivel.f)
+
+summary(agua.f)
+summary(arcentral.f)
+summary(tipocombustivel.f)
+
+## coeficientes de regressão (LINEAR MODEL (lm) )
+lm (preco ~ tamanholote + agua + idade + arcentral + tipocombustivel + areacasa + wcprivado + wcservico + quartos + lareira + uni + condicao)
+
+## guardamos em model todos os elementos que vamos precisar
+model=lm (preco ~ tamanholote + agua + idade + arcentral + tipocombustivel + areacasa + wcprivado + wcservico + quartos + lareira + uni + condicao)
+
+summary(model)
+
+summary.aov(model)
+
+
+
+#tentativa de excluir os outliers 
+
+boxplot(preco, horizontal = TRUE)$out
+
+outliers <- boxplot(preco, horizontal = TRUE)$out
+
+DadosTP[which(preco %in% outliers),]
+
+
+DadosTP1 <- DadosTP[which(preco %in% outliers),]
+
+
+boxplot(DadosTP1$`Sale Price`)
+
+lm (DadosTP1$`Sale Price`~ DadosTP1$`Lot Size` + DadosTP1$Waterfront + DadosTP1$Age + DadosTP1$`Central Air` + DadosTP1$`Fuel Type` + DadosTP1$Condition + DadosTP1$`Living Area` + DadosTP1$`Pct College` + DadosTP1$`Full Baths` + DadosTP1$`Half Baths` + DadosTP1$Bedrooms +DadosTP1$Fireplaces)
+
+
+
+```
+
+O modelo acima é obtido através da utilização da função do R lm() e o resultado é obtido com a utilização da função summary() no modelo. 
+Na primeira linha dos resultados está a fórmula utilizada para analisar os dados. A fórmula contém uma variável preditora (preço) e dez variáveis de resposta (tamanholote, agua, idade, arcentral, tipocombustivel, areacasa, wcprivado, wcservico, quartos, lareira). 
+
+A linha seguinte mostra os resíduos do modelo. Os resíduos são a diferença entre os valores reais de resposta observados e os valores de resposta que o modelo previu. 
+Para saber o quão bem o modelo se ajusta aos dados deve-se procurar uma distribuição simétrica entre esses pontos no valor da média zero. 
+A distribuição dos resíduos não parece ser fortemente simétrica, uma vez que a média é de -4585.
+
+
+---
+"Teste F- ANOVA"
+---
+
+H0: o modelo de regressão não é válido
+H1: o modelo de regressão é válido 
+valor p-value<0.05 --> rejeitar H0, 
+  
+  p-value=2.2e-16 --> rejeito h0, o modelo é válido 
+Multiple R-squared: 0.6582, 65,82% da variação do resultado é explicado pela variação das variáveis do modelo. 
+
+EXPLLICAR ANOVA
+
+```{r}
+
+library(tidyverse)
+library(caret)
+library(leaps)
+
+library(MASS)
+
+
+#ajuste completo do modelo 
+
+full.model <- lm (preco ~., data = DadosTP)
+summary(full.model)
+
+# modelo de regressão utilizando Stepwise
+# stepAIC(object, scope, scale = 0,
+#         direction = c("both", "backward", "forward"),
+#         trace = 1, keep = NULL, steps = 1000, use.start = FALSE,
+#         k = 2, ...)
+
+step.model <- stepAIC(full.model, direction = "both",
+                      trace = FALSE)
+summary(step.model)
+
+
+step.modelb <- stepAIC(full.model, direction = "backward",
+                      trace = FALSE)
+summary(step.modelb)
+
+step.modelf <- stepAIC(full.model, direction = "forward",
+                       trace = FALSE)
+summary(step.modelf)
+
+
+models <- regsubsets(preco~., data = DadosTP, nvmax = 12,
+                     method = "seqrep")
+summary(models)
+
+
+# Set seed for reproducibility
+set.seed(123)
+# Set up repeated k-fold cross-validation
+train.control <- trainControl(method = "cv", number = 10)
+# Train the model
+step.model <- train(`Sale Price` ~., data =DadosTP,
+                    method = "leapBackward",
+                    tuneGrid = data.frame(nvmax = 1:12),
+                    trControl = train.control)
+
+# precisão do modelo - escolher o menor erro médio de previsão e MAE, R squared quanto maior melhor 
+step.model$results
+
+#melhor modelo 
+step.model$bestTune
+
+#coeficientes finais do modelo 
+coef(step.model$finalModel, 5)
+summary(step.model$finalModel)
+
+#ou
+lm(preco ~ arcentral + condicao + areacasa + wcprivado + quartos,
+   data = DadosTP)
+
+AIC(step.model)
+AIC(step.modelb)
+AIC(step.modelf)
+
+
+
+
+
+```
+
+```{r}
+
+model2=lm(preco ~ arcentral + condicao + areacasa + wcprivado + quartos)
+
+summary(model2)
+```
+
+
+---
+title: "Condições assumidas pelo modelo"
+
+--- 
+```{r}
+
+```
+
+Normalidade dos resíduos: os resíduos gerados pelo ajuste da reta seguem uma distribuição normal 
+Homocedasticidade: é necessário que a variância de Y seja constante para todos os valores de X
+Independência: É necessário que não exista estrutura de dependência entre os dados, para que os resíduos sejam independentes e identicamente distribuídos.
+Desta forma é necessário avaliar as suposições acima referidas através da análise de resíduos, vista gráficamente de seguida.
+
+---
+ "Avaliação dos Resíduos"
+---
+
+```{r residuos}
+## Avaliando os resíduos 
+windows()
+par(mfrow=c(2,2))
+plot(model2)
+```
+
+
+No primeiro gráfico, observam-se os resíduos em função dos valores estimados. Este gráfico é útil para observar a independência e a homocedasticidade, se os resíduos se distribuem de maneira razoavelmente aleatória e com a mesma amplitude em torno de zero. 
+
+No segundo gráfico, pode-se avaliar a normalidade dos resíduos. A linha da diagonal a tracejado representa a distribuição normal e os pontos a distribuição dos resíduos observada. Espera-se que não exista grande fuga dos pontos em relação à linha. 
+
+O terceiro gráfico pode ser avaliado de forma semelhante ao primeiro, obeservando a aleatoriedade e amplitude desta vez dos resíduos padronizados. 
+
+O último permite visualizar as distâncias de Cook das observações, uma medida que influencia a presença de outliers quando possui valor maior do que 1. 
+
+---
+ "Provar a Normalidade"
+---
+
+##Utilizando o modelo de  KolmogrovSminorv para o model (todas as variáveis)
+```{r }
+residuals(model2)
+summary(model2$residuals)
+
+boxplot(model2$residuals)
+
+matrix <- DadosTP[, c(2,4,7,8,9,10,11,12,13)]
+matrix
+
+res<- cor(matrix)
+round(res,2)
+
+
+
+```
+
+
+---
+"One-sample Kolmogorov-Smirnov test"
+---
+
+```{r ksteste}
+ks.test(model2$residuals, "pnorm", mean(model2$residuals), sd(model2$residuals))
+
+
+
+
+```
+
+
+---
+"Shapiro-Wilk normality test"
+---
+
+```{r shap}
+## Teste do Shapiro 
+shapiro.test(model2$residuals)
+
+
+t.test(model2$residuals, mu=0, alternative = "two.sided")
+
+```
