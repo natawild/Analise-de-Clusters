@@ -1,0 +1,220 @@
+---
+title: "diabetes sem mudar"
+author: "Ana Sofia"
+date: "03/12/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+```{r}
+library(readr)
+diabetes <- read_csv("C:/Users/RP/Desktop/análise de clusters/TP2/diabetes.csv")
+View(diabetes)
+
+attach(diabetes)
+```
+
+```{r criacao}
+
+Outcome <- factor(diabetes$Outcome)
+
+levels(Outcome) <- c("Não", "Sim")
+
+is.factor(Outcome)
+
+summary(Outcome)
+```
+
+```{r tratamento dos dados}
+library(Amelia)
+
+sapply(diabetes, function (x) sum(is.na(x)))
+
+#saber se existem missing values
+data<- subset(diabetes,select=c(1,2,3,4,5,6,7,8,9))
+missmap(data, main = "Missing values vs observed")
+
+library(lattice)
+
+
+missing_data <- diabetes[,setdiff(names(diabetes), c('Outcome', 'Pregnancies'))]
+features_miss_num <- apply(missing_data, 2, function(x) sum(x <= 0))
+features_miss <- names(missing_data)[ features_miss_num > 0]
+
+
+rows_miss <- apply(missing_data, 1, function(x) sum(x <= 0) >= 1) 
+sum(rows_miss)
+
+missing_data[missing_data <= 0] <- NA
+diabetes[, names(missing_data)] <- missing_data
+
+
+#saber se existem missing values
+data1 <- diabetes[,c(-8,-9)]
+data1<- subset(diabetes,select=c(1,2,3,4,5,6,7))
+missmap(data1, main = "Missing values vs observed")
+
+# KNN imputation
+orig_data <- diabetes
+colSums(is.na(diabetes))
+
+diabetes[,c(-8,-9)] 
+
+diabetes <- diabetes[,c(-8,-9)]
+diabetes$Glucose[is.na(diabetes$Glucose)] <- mean(diabetes$Glucose,na.rm=T)
+
+diabetes$Insulin[is.na(diabetes$Insulin)] <- mean(diabetes$Insulin,na.rm=T)
+diabetes$SkinThickness[is.na(diabetes$SkinThickness)] <- mean(diabetes$SkinThickness,na.rm=T)
+diabetes$BMI[is.na(diabetes$BMI)] <- mean(diabetes$BMI,na.rm=T)
+diabetes$BloodPressure[is.na(diabetes$BloodPressure)] <- mean(diabetes$BloodPressure,na.rm=T)
+
+
+
+
+```
+
+
+```{r seed}
+library(caret)
+library(ggplot2)
+
+# Prep Training e Test
+set.seed(100)
+trainDataIndex <- createDataPartition(Outcome, p=0.7, list = F) # 70% training data
+train <- diabetes[trainDataIndex, ]
+
+
+
+
+
+test <- diabetes[-trainDataIndex, ]
+
+
+#Modelo
+model <- glm(Outcome~.,family=binomial(link='logit'),data=train)
+summary(model)
+
+```
+
+
+
+
+
+```{r model}
+library(tidyverse)
+library(caret)
+library(leaps)
+library(tidyr)
+library(dplyr)
+library(MASS)
+
+#ajuste completo do modelo 
+full.model <- glm(Outcome~.,family=binomial(link='logit'),data=train)
+
+summary(full.model)
+
+
+#método both 
+step.model <- stepAIC(full.model, direction = "both",
+                      trace = FALSE)
+summary(step.model)
+
+#método backward
+step.modelb <- stepAIC(full.model, direction = "backward",
+                      trace = FALSE)
+summary(step.modelb)
+
+#método forward
+step.modelf <- stepAIC(full.model, direction = "forward",
+                       trace = FALSE)
+summary(step.modelf)
+
+
+#verificar qual o que tem menor AIC
+AIC(step.model)
+AIC(step.modelb)
+AIC(step.modelf)
+
+```
+
+```{r models}
+models <- regsubsets(Outcome~., data=train, nvmax = 8, method = "seqrep")
+summary(models)
+
+
+#cross validation
+set.seed(123)
+# Set up repeated k-fold cross-validation
+train.control <- trainControl(method = "cv", number = 10)
+# Train the model
+step.model <- train(Outcome~., data =diabetes,
+                    method = "leapBackward",
+                    tuneGrid = data.frame(nvmax = 1:8),
+                    trControl = train.control)
+
+# precisão do modelo - escolher o menor erro médio de previsão e MAE, R squared quanto maior melhor 
+step.model$results
+
+
+#melhor modelo 
+step.model$bestTune
+
+#coeficientes finais do modelo 
+coef(step.model$finalModel, 4)
+summary(step.model$finalModel)
+```
+
+
+```{r model2}
+
+model2= glm(Outcome~ Pregnancies + Glucose + BMI + DiabetesPedigreeFunction,family=binomial(link='logit'),data=train)
+summary(model2)
+
+```
+
+```{r p}
+library(yhat)
+yhat=fitted.values(model2)
+
+fitted.results <- predict(model2,newdata=subset(test,select=c(1,2,3,6,7,9)),type='response')
+fitted.results <- ifelse(fitted.results > 0.5,1,0)
+misClasificError <- mean(fitted.results != test$Outcome)
+print(paste('Accuracy',1-misClasificError))
+
+library(tidyverse) # for data manipulation
+library(dlstats)    # for package download stats
+library(pkgsearch)
+library(ROCR)
+
+p <- predict(model2, newdata=subset(test,select=c(1,2,3,6,7,9)), type="response")
+pr <- prediction(p, test$Outcome)
+prf <- performance(pr, measure = "tpr", x.measure = "fpr")
+plot(prf)
+
+
+```
+
+
+```{r auc}
+auc <- performance(pr, measure = "auc")
+auc <- auc@y.values[[1]]
+auc
+
+```
+```{r pri}
+library(yhat)
+pr_i <- prediction(yhat, train$Outcome)
+prf_i <- performance(pr_i, measure = "tpr", x.measure = "fpr")
+plot(prf_i)
+```
+
+
+```{r auci}
+auc_i <- performance(pr_i, measure = "auc")
+auc_i <- auc_i@y.values[[1]]
+auc_i
+
+```
+
