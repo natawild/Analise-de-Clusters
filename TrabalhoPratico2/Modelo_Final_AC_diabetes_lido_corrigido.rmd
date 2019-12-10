@@ -1,0 +1,749 @@
+
+<div class=text-justify>
+---
+title: "Prediction of Diabetes in PIMA Women"
+author: "Grupo 4"
+date: "`r format(Sys.Date(), '%d/%B/%Y')`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r diabetes, message=FALSE, warning=FALSE}
+library(readr)
+diabetes <- read_csv("diabetes.csv")
+View(diabetes)
+#marcia
+#library(readr)
+#diabetes <- read_csv("C:/Users/marci.MARCIA.000/Downloads/diabetes.csv")
+#View(diabetes)
+attach(diabetes)
+```
+
+
+# Apresentação do caso de estudo
+
+Este *dataset* foi extraído do Kaggle, inicialmente retirado do Instituto Nacional de Diabetes, Doenças Digestivas e Renais dos Estados Unidos. O objetivo do estudo do conjunto de dados em questão seria prever se um paciente tem ou não diabetes, baseado em determinadas medidas de diagnóstico incluídas no *dataset*. Assim, são alvo de estudo pacientes do género feminino com pelo menos 21 anos de idade e de origem na povoação indígena Pima.
+
+
+## Pesquisa inicial sobre a diabetes   
+
+Até aos dias de hoje, não foi descoberta uma cura para a diabetes. Contudo, sabe-se que, na maioria dos casos, os maus hábitos alimentares associados a um estilo de vida sedentário aumenta a probabilidade de desenvolver um dos tipos da doença. Considerada uma epidemia global pela Organização Mundial da Saúde, o número de portadores desta doença tem crescido em Portugal, bem como em todo o mundo. No entanto, os avanços da Ciência permitem que, hoje em dia, os doentes vivam uma vida perfeitamente normal.  
+
+A diabetes é uma doença crónica que resulta numa quantidade de glicose no sangue muito elevada. Estes níveis estão associados à ingestão de qualquer tipo de hidratos de carbono (amido, frutas, leite, açúcar, etc.). Devem-se também à ineficácia do pâncreas em produzir quantidade suficiente de insulina para coincidir com os alimentos ingeridos. Assim, esta hormona não consegue conduzir a glicose (energia) às células, para que estas executem as suas funções.  
+
+
+
+Os níveis de glicemia recomendados pelos médicos para pessoas saudáveis situam-se entre os 80 e os 140 mg/dl. Estes valores variam consoante se trate de um período pré ou pós-refeição.   
+
+
+A tabela abaixo explica os valores de glicose 2 horas após a refeição.   
+  
+| VALORES DE REFERÊNCIA 2 HORAS APÓS A REFEIÇÃO |              | 
+|-----------------------------------------------|--------------| 
+| inferior 70 mg/dl                             | hipoglicemia | 
+| 70 mg/dl a 140 mg/dl                          | normal       | 
+| 140 mg/dl a 199 mg/dl                         | pré-diabetes | 
+| superior 200 mg/dl                            | diabetes     | 
+
+
+### Principais tipos de Diabetes 
+
+A **Diabetes Tipo 1 (DT1)**, também conhecida como diabetes insulinodependente, é a forma mais comum da doença. O seu diagnóstico acontece após um processo rápido de disfunção ou destruição das células beta do pâncreas. São estas células endócrinas que sintetizam e segregam insulina, uma hormona responsável pela regulação dos níveis de glicose no sangue.   
+
+  
+A doença é idiopática, isto é, não são conhecidos na totalidade os motivos que estão na origem deste processo. No entanto, sabe-se que é o sistema imunitário de cada indivíduo que ataca e destrói as células beta. Consequentemente, vão sendo criados anticorpos contra o próprio organismo, comportamento mais conhecido por autoimunidade ou processo autoimune.  
+
+  
+A **Diabetes Tipo 2 (DT2)** é causada por um desequilíbrio na produção de insulina pelo pâncreas, provocado pela diminuição das células beta ao longo do tempo. Este processo aumenta proporcionalmente a resistência à insulina por parte do paciente. Esta variante está geralmente associada ao consumo excessivo de açúcar. Para além disso, outros fatores de risco como obesidade, sedentarismo e predisposição genética podem estar na sua origem.  
+
+
+Por fim, uma terceira variante da doença acontece durante o período de gravidez: é a chamada **Diabetes Gestacional**. Apesar de poder surgir ao longo dos nove meses, é mais comum no segundo e terceiro trimestres. Durante a gravidez, o feto exige à grávida a segregação de uma maior quantidade de insulina. Esta variante da doença surge pela incapacidade do pâncreas de produzir a hormona em quantidade suficiente.  
+
+  
+Normalmente, a diabetes gestacional desaparece depois de o bebé nascer. No entanto, o seu surgimento duplica a probabilidade de a mulher vir a desenvolver **Diabetes Tipo 2** no futuro. 
+
+### Prevalência da Diabetes em Portugal 
+
+Dados do Serviço Nacional de Saúde referentes a 2017 indicam que, em Portugal, existe um milhão de portadores da doença entre os 20 e os 79 anos. Falando especificamente da **Diabetes Tipo 2**, 44% dos pacientes não sabem que são diabéticos. Trata-se de uma condição silenciosa na qual os primeiros sintomas só se manifestam quando o estado já está avançado.  
+
+  
+Já a variante Tipo 1 é mais conhecida como “a diabetes dos jovens”. Em 2015, segundo a Direção-Geral da Saúde, afetava 3327 indivíduos até aos 19 anos. Os números têm-se mantido estáveis nos últimos anos.  
+
+  
+Relativamente à Diabetes Gestacional, os dados – também de 2015 – indicavam que a doença afetava 7,2% das gestantes. Verificou-se, igualmente, uma relação de proporcionalidade direta entre a ocorrência deste tipo de diabetes e a idade da mulher grávida.  
+
+ 
+### Prevalência da Diabetes Nos Estados Unidos   
+
+Segundo os dados apresentados pela *American Diabetes Association*  referentes ao ano 2015, indicam que 30,3 milhões de americanos, ou 9,4% da população, são portadores da doença.   
+
+A Diabetes foi considerada a sétima causa de morte nos Estados Unidos em 2015, com 79535 atestados de óbito causados diretamente pela diabetes. E foi apontada como causa subjacente ou contribuinte em 252806 atestados de óbito.   
+
+### A diabetes, o excesso de peso e a atividade física 
+
+O **Índice de Massa Corporal (IMC)** é um índice usado para a classificação do peso corporal em adultos, que relaciona o peso com a altura. A fórmula deste índice é definida pelo peso do indivíduo (em kilogramas) dividido pelo quadrado da sua altura (em metros). 
+
+
+IMC = peso (kg) /altura (m)×altura (m).
+
+
+A Organização Mundial de Saúde (OMS) classifica a obesidade de acordo com os seguintes critérios: 
+
+| Classificação    | IMC (kg/m2) | 
+|------------------|-------------| 
+| Baixo Peso       | ≤ 18,5      | 
+| Peso normal      | 18,5 a 24,9 | 
+| Pré-obesidade    | 25 a 29,9   | 
+| Obesidade grau 1 | 30 a 34,9   | 
+| Obesidade grau 2 | 35 a 39,9   | 
+| Obesidade grau 3 | ≥ 40        | 
+
+
+Existe uma relação entre o **Índice de Massa Corporal (IMC)** acima dos indicadores normais (18,5 a 24,9) e a **Diabetes Tipo 2**. A prevalência deste tipo de diabetes verifica-se em pessoas com IMC superior a 30. Este valor é cerca de quatro vezes superior ao das pessoas que se encontram dentro dos indicadores normais.  A prática de exercício físico regular tem sempre um papel positivo no controlo da diabetes. Esta rotina potencia a segregação de insulina e apoia o seu transporte até às células. Além disso, auxilia na redução de peso e na melhoria dos valores do IMC.
+
+
+$k_n^2$
+
+
+# Análise do *Dataset*
+
+O *dataset* contém informação de 768 mulheres, das quais 268 foram diagnosticadas com diabetes. As informações disponíveis incluem 8 variáveis, tais como Idade, Número de gestações, Glicose, Insulina, etc. Uma descrição mais detalhada sobre as variáveis está exposta nos pontos abaixo. A variável resposta no conjunto de dados é um classificador binário, *Outcome*, que indica se a pessoa foi diagnosticada com diabetes ou não.
+
+
+* **Pregnancies**: Número de vezes que engravidou;
+
+* **Glucose**: Concentração de glicose no plasma 2 horas após refeição, num teste de tolerância à glicose (mg/dl); 
+
+* **BloodPressure**: Pressão sanguínea diastólica (mm Hg);
+
+* **SkinThickness**: Espessura da dobra da pele dos tríceps (mm);
+
+* **Insulin**: Insulina sérica de 2 horas (µU/ml); 
+
+* **BMI**: índice de massa corporal (IMC) (kg/m^2);
+
+* **DiabetesPedigreeFunction**: Função de hereditariedade da diabetes (uma função que pontua a possibilidade de diabetes com base no histórico familiar);
+
+* **Age**: Idade (anos)
+
+* **Outcome**: Variável de classe (0 se não diabético, 1 se diabético)
+
+
+### **Variável dependente**
+
+Uma variável dependente é uma medida que dependerá do valor de outra variável ou de um conjunto de variáveis. Na regressão logística, a variável dependente é dicotómica (*Outcome*), atribuindo-se o valor 1 ao acontecimento de ter diabetes e 0 ao acontecimento complementar, ou seja, esta variável define se o paciente possuí ou não a doença diabetes.
+
+
+### **Variáveis Independentes**
+
+Uma variável independente é uma medida que não depende de nenhuma outra variável, sendo que existem 8 variáveis deste tipo no modelo. Foram consideradas variáveis tais como o número de gestações, a concentração de glicose no plasma (mg/dl) , a pressão sanguínea diastólica (mm Hg), a espessura da pele dos tríceps (mm), o nível de insulina (µU/ml), o índice de massa corporal (kg/m^2), a função de hereditariedade da diabetes e a idade em anos.
+
+
+### Criação da variável "*Outcome*" como fator 
+
+Uma vez que no *dataset* em estudo a variável resposta se trata de uma binária (0 e 1), foi necessário cria um fator para a mesma.
+
+Para criar a variável como fator utilizou-se a função "factor", na qual o único argumento necessário é um vetor de valores. O argumento "levels" determina as categorias da variável fator, sendo o padrão atribuido o correpondente: 0, ou seja, não possuir diabetes fica representado por "Não" e 1, ter diabetes, representado por "Sim".
+
+```{r criacao fator, warning=FALSE}
+Outcome <- factor(diabetes$Outcome)
+levels(Outcome) <- c("Não", "Sim")
+is.factor(Outcome)
+summary(Outcome)
+```
+
+# Tratamento de dados 
+
+### Gráfico do *MissMap*
+Numa primeira fase analisaram-se os *missing values* existentes no *dataset*. Para tal foi gerado um gráfico, através da função *missmap*, esta que permite verificar esses valores. 
+
+```{r missing values inicial, warning=FALSE}
+library(Amelia)
+sapply(diabetes, function (x) sum(is.na(x)))
+#saber se existem missing values
+data<- subset(diabetes,select=c(1,2,3,4,5,6,7,8,9))
+missmap(data, main = "Missing values vs observed")
+```
+
+Da análise do gráfico concluiu-se que não existiam valores em falta efetivos (?). No entanto, percebeu-se que existiam muitos zeros no modelo que não fariam sentido para o mesmo. Esses mesmos valores estavam presentes nas variáveis *Glucose*, *Insulin*, *SkinThickness*, *BMI* e *Bloodpressure*.  Uma vez que registos com zero nestas variáveis não fariam sentido do ponto de vista biológico, foi necessária uma análise mais cuidada para com estas.
+
+
+### Substituição dos Zeros por "NA"
+
+Nesta fase surgiu a necessidade de limpar o *dataset*, de forma a tratar as anomalias em medidas biológicas como, por exemplo, a espessura da pele e a insulina que apresentavam 227 e 374 valores zero, respetivamente.  Desta forma, sabe-se que este valor indica ausência de valor e não um valor com significado. Os valores ausentes nas colunas referentes à espessura da pele e insulina constituíram cerca de 30% e 49% das observações, respetivamente. Por este motivo, a remoção desses valores resultaria numa perda significativa de informação. 
+Posto isto optou-se por:
+
+* Transformar os zeros em "NA"
+* Transformar os "NA" na média daquela coluna
+
+De realçar o facto de a variável da gravidez ter, efetivamente, 0 gestações e, por isso, não ter sido substituído o zero pela média. Desta forma, conseguiu-se remover os zeros (que não faziam sentido) e conseguir assim, um *dataset* limpo e pronto a explorar.
+
+```{r atribuicao de NA, message=FALSE, warning=FALSE}
+library(lattice)
+missing_data <- diabetes[,setdiff(names(diabetes), c('Outcome', 'Pregnancies'))]
+features_miss_num <- apply(missing_data, 2, function(x) sum(x <= 0))
+features_miss <- names(missing_data)[ features_miss_num > 0]
+
+rows_miss <- apply(missing_data, 1, function(x) sum(x <= 0) >= 1) 
+sum(rows_miss)
+
+missing_data[missing_data <= 0] <- NA
+diabetes[, names(missing_data)] <- missing_data
+```
+
+### Gráfico com os *missing values* depois do tratamento de dados
+
+Depois de transformar os zeros em "NA" decidiu-se verificar se efetivamente os *missing values* estão presentes, através do *missmap*. Assim, verifica-se que 9% dos dados passaram a *missing values*, ou seja, têm "NA".  
+
+```{r missing values com NA, warning=FALSE}
+library(Amelia)
+
+sapply(diabetes, function (x) sum(is.na(x)))
+datanovo<- subset(diabetes,select=c(1,2,3,4,5,6,7,8,9))
+missmap(datanovo, main = "Missing values vs observed")
+```
+
+Assim, fez-se a transformação dos *missing values*, colocando a média da variável como valor. 
+
+```{r tratamento de dados, message=FALSE, warning=FALSE}
+orig_data <- diabetes
+colSums(is.na(diabetes))
+diabetes$Glucose[is.na(diabetes$Glucose)] <- mean(diabetes$Glucose,na.rm=T)
+diabetes$Insulin[is.na(diabetes$Insulin)] <- mean(diabetes$Insulin,na.rm=T)
+diabetes$SkinThickness[is.na(diabetes$SkinThickness)] <- mean(diabetes$SkinThickness,na.rm=T)
+diabetes$BMI[is.na(diabetes$BMI)] <- mean(diabetes$BMI,na.rm=T)
+diabetes$BloodPressure[is.na(diabetes$BloodPressure)] <- mean(diabetes$BloodPressure,na.rm=T)
+```
+
+### Distribuição da variável resposta
+
+```{r dist vv outcome}
+library(ggplot2)
+ggplot(diabetes,aes(Outcome,fill = factor(diabetes$Outcome))) +
+  geom_bar() + labs (fill = "Legenda") +
+  geom_text(stat='count', aes(label=..count..),vjust=0,size=5,nudge_y=0.125) +
+  ggtitle("Distribuição da variável dependente")
+```
+
+O *dataset* tem 268 mulheres que foram diagnosticadas com diabetes e 500 mulheres que não têm diabetes. A amostra tem uma grande prevalência da doença diabetes (aproximadamente 35%). 
+
+
+## Análise da variável "Pregnancies"
+
+```{r barplot Gravidez}
+grav <- c(111, 135,103,75,68,57,50,45,38,28,24,11,9,10,2,1,1)
+ b <- barplot(grav,
+ main = "Gravidez",
+ xlab = "Número de vezes grávida",
+ ylab = "Número de pacientes",
+ ylim = c(0,150),
+ names.arg = c(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,17),
+ col = c("lightblue"),
+ col.main="blue",
+ horiz = FALSE)
+text(b,grav+10,labels=as.character(grav))
+```
+
+Através do gráfico de barras representado acima é possível reparar na maior concentração de pacientes com número de gestações reduzidas ou nulas. Para além disso, destaca-se que existe um maior número de pacientes com apenas uma gravidez, totalizando 135 pacientes com essa característica. 
+
+
+```{r gravidez, message=FALSE, warning=FALSE}
+table(Pregnancies, factor(diabetes$Outcome))
+
+library(ggplot2)
+p1 <- ggplot(diabetes, aes(x = factor(diabetes$Outcome), y = Pregnancies, fill = factor(diabetes$Outcome))) +
+  geom_boxplot() + theme(legend.position = "bottom") +
+  labs (x = "Resultado") + labs (y ="Número de gestações" ) + labs (fill = "Legenda") +
+  ggtitle("Número de gestações Vs Diabetes")
+
+p2 <- ggplot(diabetes,aes(x = Pregnancies, fill = factor(diabetes$Outcome))) + 
+  geom_bar(position = "Dodge") +  scale_x_continuous(limits = c(-1,17)) +
+  labs (x = "Resultado") +  labs (fill = "Legenda") + labs(title = "Gravidez Vs Resultado") +
+  theme(legend.position = "bottom") + geom_text(stat='count', aes(label=..count..),vjust=0,size=3,nudge_y=0.125)
+
+library(gridExtra)
+gridExtra::grid.arrange(p1, p2, ncol = 2)
+```
+
+Analisando os *boxplots* é possível constatar que o primeiro tem um comportamento bastante assimétrico. O gráfico de barras ao lado ajuda a perceber que pessoas não diabéticas apresentam–se em mais quantidade com 0, 1 e 2 gestações, diminuindo à medida que vai aumentando o número de vezes que uma mulher esteve grávida. Por esse motivo, o terceiro quartil e quarto apresentam valores mais dispersos em relação à gravidez. 
+
+Outro ponto a destacar é o facto de à medida que se aumenta a quantidade de gestações, a proporção de pacientes com diabetes aumenta. Observa-se ainda que nos últimos valores mais altos de gestações apenas existem pacientes com diabetes. 
+
+Pode-se ainda retirar que, em média, pacientes com diabetes apresentam um maior número de gestações. 
+
+
+## Análise da variável "Glucose"
+
+```{r plot glicose, message=FALSE, warning=FALSE}
+p2 <- ggplot(diabetes, aes(x = Glucose, fill = factor(diabetes$Outcome))) +
+  geom_density(alpha = 0.8) + theme(legend.position = "bottom") +
+  labs (fill = "Legenda") + labs(x = "Glicose", y = "Densidade", title = "Gráfico de densidade da glicose")
+
+p1 <- ggplot(diabetes, aes(x = Outcome, y = Glucose,fill = factor(diabetes$Outcome))) +
+  geom_boxplot() + theme(legend.position = "bottom") +
+  labs (fill = "Legenda") +  ggtitle("Variação da glicose Vs Diabetes")
+
+gridExtra::grid.arrange(p1, p2, ncol = 2)
+```
+
+Analisando os gráficos é possível depreender que estes apresentam-se bastante simétricos. Por isso, pode-se concluir que em média pessoas com diabetes apresentam níveis de glicose no sangue mais elevado. 
+
+
+## Análise da variável "Blood Pressure"
+
+```{r blood pressure, message=FALSE, warning=FALSE}
+p2 <- ggplot(diabetes, aes(x = BloodPressure, fill = factor(diabetes$Outcome))) +
+  geom_density(alpha = 0.8) + theme(legend.position = "bottom") +
+  labs (fill = "Legenda") + labs(x = "Pressão Sanguínea", y = "Densidade", title = "Gráfico de densidade vs Diabetes")
+
+p1 <- ggplot(diabetes, aes(x = factor(diabetes$Outcome), y = BloodPressure,fill = factor(diabetes$Outcome))) +
+  geom_boxplot() + theme(legend.position = "bottom") +
+  labs (fill = "Legenda") + ggtitle("Pressão Sanguínea Vs Diabetes")
+
+gridExtra::grid.arrange(p1, p2, ncol = 2)
+```
+
+Da análise dos gráficos percebe-se que, no que diz respeito à pressão sanguínea, não existe muita diferença nas mulheres que têm diabetes e nas que não têm.  Em média, a pressão arterial de uma mulher com diabetes é muito similar à de uma mulher sem diabetes. Para além disto, existe uma maior probabilidade de ocorrer uma pressão sanguínea de aproximadamente 75 (mm Hg), em ambos os casos. Por não existir grande diferença de conclusões entre mulheres diabéticas e saudáveis, suspeita-se que esta possa ser uma variável a retirar do modelo, no futuro. 
+
+
+## Análise da variável "SkinThickness"
+
+```{r skinthickness, message=FALSE, warning=FALSE}
+ggplot(diabetes, aes(x = SkinThickness, fill = factor(diabetes$Outcome))) +
+  geom_density(alpha = 0.8) + theme(legend.position = "bottom") +
+  labs (fill = "Legenda") + labs(x = "Espessura da pele dos tríceps", y = "Densidade", title = "Gráfico de densidade")
+```
+
+Pela análise do gráfico percebe-se que existe uma relação entre a espessura da pele dos tríceps e a ocorrência de diabetes. Em suma, mulheres que apresentam maiores valores de espessura da pele dos tríceps possuem uma maior probabilidade de ocorrência da diabetes, ou seja, diz respeito a uma maior concentração de mulheres com diabetes. Em contrapartida, menores valores de espessura da pele possuem uma densidade superior de mulheres sem diabetes, comparativamente às mulheres que possuem. Apesar disso, a moda de valores da espessura da pele é muito semelhante para os dois casos, sendo maior a probabilidade de essa ocorrer num caso de uma mulher possuir diabetes do que no oposto.    
+
+
+## Análise da variável "Insulin"
+
+```{r var insulina, message=FALSE, warning=FALSE}
+library(ggplot2)
+ggplot(diabetes, aes(x = factor(diabetes$Outcome), y = Insulin ,fill = factor(diabetes$Outcome))) +
+  geom_boxplot() + theme(legend.position = "bottom") +
+   labs (x = "Resultado") + labs (y ="Insulina" ) + labs (fill = "Legenda") +
+  ggtitle("Boxplot Insulina vs Diabetes")
+```
+
+Neste caso específico, percebe-se que em mulheres sem diabetes existe uma maior concentração de registos com quantidade de insulina verificada abaixo de 155, aproximadamente. No caso de mulheres com diabetes a concentração é maior acima desse mesmo número. Do ponto de vista lógico, percebe-se que para valores mais altos de insulina existe uma maior concentração de pessoas com diabetes. 
+
+
+## Análise da variável "BMI"
+
+
+```{r bmi, message=FALSE, warning=FALSE}
+p2 <- ggplot(diabetes, aes(BMI, fill = factor(diabetes$Outcome))) +
+  geom_histogram() + theme(legend.position = "bottom") + 
+  labs(fill="Legenda") + labs(y="Quantidade de pacientes")+
+  ggtitle("IMC Vs Diabetes")
+
+p1 <- ggplot(diabetes, aes(x = factor(diabetes$Outcome), y = BMI, fill = factor(diabetes$Outcome))) +
+  geom_boxplot() + theme(legend.position = "bottom") +
+  labs(fill="Legenda") + labs (x = "Resultado") + labs (y ="Indice massa corporal" ) + 
+  ggtitle("Variação do IMC Vs Diabetes")
+
+gridExtra::grid.arrange(p1, p2, ncol = 2)
+```
+
+Pela análise dos gráficos produzidos, é possível verificar que todas as mulheres com diabetes tinham um IMC superior a 25, valor este que está acima dos níveis normais. Pode-se, assim, concluir que a obesidade poderá ser um fator de risco para a diabetes. Por outro lado, as mulheres que não tinham diabetes tinham um IMC que variava entre 18 e 60, o que poderá ser um factor de risco, no futuro, para os casos em que os valores de IMC são superiores a 30. 
+
+
+## Análise da variável "DiabetesPedigreeFunction"
+
+```{r genetica, message=FALSE, warning=FALSE}
+p2 <- ggplot(diabetes, aes(DiabetesPedigreeFunction, fill = factor(diabetes$Outcome))) +
+  geom_histogram() + theme(legend.position = "bottom") + 
+  labs(fill="Legenda") + labs(y="Quantidade de pacientes")+
+  ggtitle("Função genética Vs Diabetes")
+
+p1 <- ggplot(diabetes, aes(x = factor(diabetes$Outcome), y = DiabetesPedigreeFunction, fill = factor(diabetes$Outcome))) +
+  geom_boxplot() + theme(legend.position = "bottom") +
+  labs(fill="Legenda") + labs (x = "Resultado") + labs (y ="Função genética" ) + 
+  ggtitle("Função genética Vs Diabetes") 
+
+gridExtra::grid.arrange(p1, p2, ncol = 2)
+```
+
+O gráfico permite verificar uma relação entre a função de hereditariedade e os resultados das mulheres portadoras da doença. Como os valores, para o caso de mulheres com diabetes, têm uma mediana mais alta e valores da função de hereditariedade mais altos, fica claro que esta variável ajuda de facto a estimar com precisão os resultados de ser portador ou não da doença. Isto mostra que a diabetes poderá ser influenciada pela genética, isto é, se uma mulher possui familiares com a doença, tem um maior risco de contrair a mesma. No caso de as mulheres não possuirem diabetes parecem ter valores de função de hereditariedade mais baixos do que aquelas que apresentavam a doença. Ambos os resultados apresentaram muitos *outliers*, mas estes para as mulheres que não apresentaram a doença parecem ter valores mais baixos do que aquelas que são portadoras da doença. 
+
+## Relação das variáveis "Pregnancies" vs "Age" e da "Glucose" vs "Insulin"
+
+```{r idade vs diabetes   insulina vs glicose}
+p1 <- ggplot(diabetes, aes(x = Age, y = Pregnancies)) +
+  geom_point(aes(color=Outcome)) +  theme(legend.position = "bottom") +
+  ggtitle("Influência da idade com a gravidez")
+
+p2 <- ggplot(diabetes,aes(x=Insulin,y=Glucose))+
+  geom_point(aes(color=Outcome))+ theme(legend.position = "bottom") +
+  ggtitle("Influência da insulina com a glicose")
+
+gridExtra::grid.arrange(p1, p2, ncol = 2)
+```
+
+Analisando o gráfico de dispersão no qual são avaliadas a idade e o número de gestações, não é clara a existência de um limite que poderá separar as mulheres não diabéticas e diabéticas com base nestas variáveis.  
+
+Segundo o gráfico de dispersão que compara a glicose com a insulina é possível concluir que as mulheres não diabéticas parecem ter níveis mais baixos de insulina e glicose.  
+
+Por outro lado, as mulheres diabéticas registaram níveis baixos a altos de insulina e altos níveis de glicose. Estes resultados poderão estar relacionados com os diferentes tipos de diabetes, pois no caso de diabetes de tipo 1, o pâncreas deixa de produzir insulina implicando uma subida de açúcar (glicose) no sangue (níveis baixos de insulina). Quando se trata de diabetes tipo 2, as células beta do pâncreas produzem insulina, mas não o suficiente para baixar o açúcar no sangue e produzir a energia que o corpo necessita (altos níveis de glicose). Neste tipo, existe também a condição chamada de resistência à insulina, em que as células do corpo não funcionam corretamente, por isso não conseguem captar a insulina e manter a glicose controlada, explicando assim, níveis altos de insulina.
+
+## Relação das variáveis "BMI" vs "BloodPressure" e da "BMI" vs "DiabetesPedigreeFunction"
+
+```{r imc vs pressao do sangue e imc vs funcao hereditariedade}
+p1 <- ggplot(diabetes,aes(x=BMI,y=BloodPressure))+
+  geom_point(aes(color=Outcome))+ theme(legend.position = "bottom") +
+  ggtitle("Relação do BMI com a BP ")
+
+p2 <- ggplot(diabetes,aes(x=BMI,y= DiabetesPedigreeFunction))+
+  geom_point(aes(color=Outcome)) + theme(legend.position = "bottom") +
+  ggtitle("Relação do BMI com a função hereditariedade")
+
+gridExtra::grid.arrange(p1, p2, ncol = 2)
+```
+
+Quando o IMC varia desde os 18 até aos 30 e a pressão arterial entre os 50 e 90 mm Hg, a maioria das mulheres não se apresentam com diabetes. Quando o valor de IMC aumenta e a pressão arterial se mantém nos mesmos valores, existe uma maior propensão para a existência de diabetes nos indivíduos em estudo.  
+Segundo o gráfico que compara o IMC com a hereditariedade verifica-se que as mulheres que se apresentam como portadoras de diabetes atingem um IMC maior assim como os valores da função de hereditariedade. Portanto pode-se concluir que o IMC e a função de hereditariedade são variáveis que apresentam valores que poderão ajudar a prever se um paciente terá ou não a doença de diabetes.  
+
+
+### Matriz de correlação 
+
+A matriz de correlação mede o grau de relação entre cada par de variáveis, tendo por base o coeficiente de Pearson. Os valores de correlação variam entre -1 e +1, em que -1 significa uma correlação negativa entre as variáveis, ou seja, quando uma aumenta a outra diminui e 1 significa uma correlação positiva.
+
+```{r matriz}
+library(corrplot)
+matriz <- diabetes[, c(1,2,3,4,5,6,7,8)]
+res<- cor(matriz)
+round(res,2)
+corrplot(res, method = "circle")
+```
+
+Pela análise da matriz percebe-se que nenhuma das variáveis se encontram fortemente correlacionadas. As variáveis com maior correlação entre elas é a *Age*  e  a *Pregnancies*, ou seja, a idade e o número de vezes que a pessoa esteve grávida, sendo o coeficiente de correlação de 0.54 (superior a 0.5).
+
+
+# Modelação  - Regressão logística
+
+A técnica de modelação utilizada neste trabalho foi a regressão logística. A regressão logística é uma técnica estatística que tem como objetivo modelar, a partir de um conjunto de observações, a relação “logística” entre uma variável resposta dicotómica e uma série de variáveis explicativas numéricas (continuas, discretas) e/ou categóricas. O principal objetivo deste modelo é explorar a relação entre uma ou mais variáveis explicativas (ou independentes) e uma variável resposta (ou dependente). Um dos casos particulares dos modelos lineares generalizados são os modelos onde a variável resposta apresenta apenas duas categorias, assumindo valores 0 ou 1.  
+
+O *dataset* foi dividido em 70% para treino e 30% para teste. 
+
+```{r train-test}
+library(caret)
+library(ggplot2)
+
+# Prep Training e Test
+set.seed(100)
+trainDataIndex <- createDataPartition(Outcome, p=0.7, list = F) # 70% training data
+train <- diabetes[trainDataIndex, ]
+test <- diabetes[-trainDataIndex, ]
+```
+
+
+O modelo foi criado utilizando a variável *Outcome* como variável resposta e as restantes 8 como variáveis preditoras. 
+
+```{r model}
+#Modelo
+model <- glm(Outcome ~.,family=binomial(link='logit'),data=train)
+summary(model)
+```
+
+Pela análise inicial do modelo criado com todas as variáveis, é possível perceber que existem quatro variáveis mais significativas, são elas a *Pregnancies*, *Glucose*, *BMI* e *DiabetesPedigreeFunction*, uma vez que apresentam *p-values* inferiores a 0.05. Todas as variáveis com *p-values* superiores deveriam ser retiradas do modelo. 
+
+De forma a conseguir perceber se esta análise está correta decidiu-se utilizar o modelo da regressão gradual de forma a identificar as variáveis mais importantes. 
+
+
+### Stepwise Regression (Regressão gradual)
+
+A regressão gradual consiste em adicionar e remover iterativamente preditores no modelo de previsão, de forma a encontrar o subconjunto de variáveis que resultam no modelo com melhor desempenho, ou seja, o modelo que reduz o erro de previsão.
+
+Existem 3 formas de o fazer: 
+
+* **Forward selection**: começa sem preditores no modelo e adiciona iterativamente as variáveis que mais contribuem. Termina quando a melhoria deixa de ser estatisticamente significativa. 
+
+* **Backward selection**: começa com todos os preditores no modelo, removendo iterativamente os que menos contribuem. Termina quando encontrar o modelo no qual todos os preditores são estatisticamente significativos.
+
+* **Stepwise selection**: é uma combinação das duas seleções anteriores. Começa sem preditores e sequencialmente adiciona os que mais contribuem. Depois de adicionar cada variável nova, remove as variáveis que já não proporcionam melhorias ao modelo. 
+
+
+Para implementar a regressão gradual utilizou-se a função "stepAIC" que permite saber qual o melhor modelo com base no AIC (*Akaike’s Information Criteria*). Este critério estima a qualidade de cada modelo criado para os dados, em relação a cada um dos outros modelos. A opção *direction* permite escolher qual das estratégias aplicar, *backward*, *forward* ou *both* (as duas em conjunto). No final, permite saber qual o melhor modelo. 
+
+```{r aic}
+library(tidyverse)
+library(caret)
+library(leaps)
+library(tidyr)
+library(dplyr)
+library(MASS)
+
+#ajuste completo do modelo 
+full.model <- glm(Outcome~.,family=binomial(link='logit'),data=train)
+summary(full.model)
+
+#método both 
+step.model <- stepAIC(full.model, direction = "both",
+                      trace = FALSE)
+summary(step.model)
+
+#método backward
+step.modelb <- stepAIC(full.model, direction = "backward",
+                      trace = FALSE)
+summary(step.modelb)
+
+#método forward
+step.modelf <- stepAIC(full.model, direction = "forward",
+                       trace = FALSE)
+summary(step.modelf)
+
+#verificar qual o que tem menor AIC
+AIC(step.model)
+AIC(step.modelb)
+AIC(step.modelf)
+```
+
+No fim utiliza-se a função AIC para saber os valores para os 3 modelos. Chegou-se à conclusão que existem dois modelos com o mesmo AIC, de 501.0397, logo escolher qualquer um deles levará a resultados equivalentes. 
+
+
+O parâmetro "nvmax" da função "regsubsets" especifica o número máximo de preditores para incorporar no modelo. Devolve vários modelos com diferentes tamanhos até "nvmax". Deve-se comparar os vários modelos de forma a escolher o melhor. Esta função tem a opção "method" que permite escolher *forward*, *backward* e *seqrep* (que é uma combinação das seleções *forward* e *backward*). 
+
+```{r  models}
+models <- regsubsets(Outcome~., data=train, nvmax = 8, method = "seqrep")
+summary(models)
+```
+
+A função "train" tem uma opção "method" que permite escolher um dos seguintes valores: 
+
+* **leapBackward**: para a seleção "backward"
+
+* **leapForward**: para a seleção "forward"
+
+* **leapSeq**: para a seleção "stepwise" 
+
+O parâmetro "nvmax" corresponde ao número máximo de preditores para serem incorporados no modelo. Neste caso, como a base de dados contém 8 variáveis a serem exploradas, o "nvmax" varia entre 1 e 8. Isto permite obter os 8 melhores modelos com tamanhos diferentes, o melhor modelo de uma variável, de duas variáveis e assim sucessivamente.  
+
+Utiliza-se a *10-fold cross validation* para estimar o erro médio de previsão (RMSE). Este é usado para comparar os 8 melhores modelos e escolher o melhor, ou seja, o modelo que minimiza o erro médio de previsão. 
+
+O modelo com 4 variáveis é aquele que tem o menor RMSE, sendo assim considerado o melhor modelo.
+
+```{r  coefs}
+#cross validation
+set.seed(123)
+# Set up repeated k-fold cross-validation
+train.control <- trainControl(method = "cv", number = 10)
+# Train the model
+step.model <- train(Outcome~., data = diabetes,
+                    method = "leapBackward",
+                    tuneGrid = data.frame(nvmax = 1:8),
+                    trControl = train.control)
+
+# precisão do modelo - escolher o menor erro médio de previsão e MAE
+step.model$results
+
+#melhor modelo 
+step.model$bestTune
+
+#coeficientes finais do modelo 
+coef(step.model$finalModel, 4)
+summary(step.model$finalModel)
+
+```
+
+
+ As variáveis formam a expressão *logit* do modelo, representada por: 
+
+ $g(x) = -9.62124129 +  0.13877111pregnancies + 0.03852866Glucose  + 0.09838685BMI + 0.87090498DiabetesPedigreeFunction$
+                                                             
+ 
+#### **Interpretação dos coeficientes obtidos:**
+
+Determinou-se o efeito que os coeficientes exercem sobre a probabilidade de um evento ocorrer:
+
+* Coeficiente positivo aumenta a probabilidade
+
+* Coeficiente negativo diminui a probabilidade
+
+Neste caso, tal como se pode verificar na fórmula acima , todos os coeficientes são positivos, revelando que todos aumentam a probabilidade de contrair a doença da diabetes. Por exemplo: o aumento de uma gravidez faz com que a probabilidade de ter diabetes aumente em  0.13877111.
+
+```{r modelo2}
+model2= glm(Outcome~ Pregnancies + Glucose + BMI + DiabetesPedigreeFunction,family=binomial(link='logit'),data=train)
+summary(model2)
+```
+
+## Interpretando os resultados do modelo de regressão logística
+
+Ao executar a função ANOVA no modelo é possível analisar a tabela da *deviance*.  
+
+```{r anova}
+anova(model2, test="Chisq")
+```
+
+A diferença entre o desvio nulo e o desvio residual mostra como o modelo está em relação ao modelo nulo, ou seja, o modelo que tem apenas a constante. Quanto maior esta diferença, melhor o modelo. A análise da tabela mostra que sempre que se adiciona uma variável há um decréscimo no desvio. Adicionando as variáveis *Pregnancies*, *Glucose*, *BMI* e a *DiabetesPedigreeFunction * existe uma redução do desvio residual, apesar de não ser substancial. 
+
+Apesar destas conclusões, é importante referir que as diferenças não são muito elevadas, uma vez que, como já foi explicado anteriormente, o modelo com todas as variáveis e o modelo reduzido produzem resultados muito parecidos. Foi decidido retirar as variáveis pouco significativas porque se considerou que estavam a sobreestimar o modelo. 
+
+
+```{r mcfadden}
+library(pscl)
+pR2(model2)
+```
+
+O índice McFadden R2 pode ser usado para avaliar o ajuste do modelo. Para este modelo, o valor é de 0.2948, o que significa que o modelo é adequado. 
+
+
+
+
+
+## *Accuracy* do modelo
+
+Inicialmente foi necessário carregar o *package* *yhat* que fornece vários métodos para interpretar resultados de regressão logística. Note-se que o primeiro comando utiliza a expressão *fitted.values* que é uma função genérica que extrai valores ajustados de objetos devolvidos por funções de modelação. Neste caso foi aplicado ao *model2*, ou seja, o objeto para o qual a extração dos valores ajustados do modelo foi significativa.
+
+### Avaliação a capacidade preditiva do modelo
+
+Nas etapas acima foi avaliado o ajuste do modelo, sendo agora necessário analisar de que forma este prevê um novo conjunto de dados. Ao definir o tipo de parâmetro = '*response*', serão produzidas probabilidades na forma de P (y = 1 | X). O limite de decisão será 0,5. Se P (y = 1 | X)> 0,5 então y = 1 caso contrário y = 0.
+
+```{r accuracy}
+library(yhat)
+yhat=fitted.values(model2)
+
+fitted.results <- predict(model2,newdata=subset(test,select=c(1,2,6,7)),type='response')
+fitted.results <- ifelse(fitted.results > 0.5,1,0)
+misClasificError <- mean(fitted.results != test$Outcome)
+print(paste('Accuracy',1-misClasificError))
+```
+
+Através do *miss clasific Error* foi possível encontrar uma *accuracy* de 0.75 no conjunto de testes, sendo considerado um bom resultado. No entanto, este resultado depende um pouco da divisão manual dos dados que foi anteriormente feita.()
+
+
+```{r predict}
+library(tidyverse) # for data manipulation
+library(dlstats)    # for package download stats
+library(pkgsearch)
+library(ROCR)
+library(gplots)
+
+
+p <- predict(model2, newdata=subset(test,select=c(1,2,6,7)), type="response")
+pr <- prediction(p, test$Outcome)
+prf <- performance(pr, measure = "tpr", x.measure = "fpr")
+plot(prf)
+
+```
+
+
+Foi desenhada a curva ROC, que é uma medida típica de desempenho para um classificador binário. 
+Esta curva é gerada pela relação da taxa positiva verdadeira (TPR) com a taxa de falsos positivos (FPR) em várias configurações de limite enquanto  que a AUC é a área sob a curva ROC.
+
+
+```{r auc}
+auc <- performance(pr, measure = "auc")
+auc <- auc@y.values[[1]]
+auc
+
+```
+Foi ainda calculada a AUC (área sob a curva), também ela uma medida de desempenho bastante utilizada.
+
+
+```{r pri}
+library(yhat)
+pr_i <- prediction(yhat, train$Outcome)
+prf_i <- performance(pr_i, measure = "tpr", x.measure = "fpr")
+plot(prf_i)
+```
+
+
+```{r  auci}
+auc_i <- performance(pr_i, measure = "auc")
+auc_i <- auc_i@y.values[[1]]
+auc_i
+```
+Em geral, um modelo com boa capacidade preditiva deve ter uma AUC mais próxima de 1 (1 é ideal) do que 0.5, logo o valor obtido de 0.85 apresenta-se bastante adequado.
+
+
+## Testes ao modelo 
+
+
+```{r}
+exp(coefficients(model2)) 
+coef(model2)
+
+```
+
+
+### **Pregnancies**
+  
+$OR= 1.1488$
+A possibilidade de uma mulher com 1 gravidez ter diabetes é cerca de 1.1488 vezes maior do que uma que nunca tenha estado grávida. 
+  
+  
+### **Glucose**  
+```{r glicose}
+coefficients(model2)
+exp(0.03852866*10)
+```
+
+$OR = 1.470036$
+Um aumento de 10 mg de glicose no sangue faz com que uma mulher tenha cerca de 1.47 vezes mais possibilidade de ter diabetes.  
+
+### **BMI**  
+```{r coef bmi}
+coefficients(model2)
+exp(0.09838685*5)
+```
+
+$OR = 1.635477$
+Um acréscimo de 5 unidades no IMC aumenta em 1.64 vezes a possibilidade de uma mulher vir a ser portadora da diabetes. 
+
+#### **DiabetesPedigreeFunction**
+```{r coef funcao genetica}
+coefficients(model2)
+exp(2.389072e+00*0.1)
+```
+
+$OR = 1.269861$
+Um aumento de 0.1 na função de hereditariedade implica que uma mulher tenha cerca de 1.27 vezes mais possibilidade de ter diabetes.
+
+
+###  Previsão 
+
+De forma a utilizar o modelo de regressão logística, para prever a probabilidade da diabetes ocorrer, efetuou-se um teste ao mesmo.
+
+
+
+```{r}
+t=(1+exp(-(predict(model2,list(Pregnancies=5,BMI=30,DiabetesPedigreeFunction=0.25,Glucose=100)))))^-1
+t
+```
+
+Uma mulher que esteve 5 vezes grávida, tem um índice de massa corporal de 30, uma função de hereditariedade de 0.25 e um nível de glicose de 100, tem uma probabilidade de ter diabetes de 0.1295. 
+
+###  Conclusões
+
+* A regressão logística tem muitas vantagens perante a regressão linear (resíduos não precisam estar normalizados);
+
+
+*A análise exploratória inicial das variáveis está coerente com os resultados obtidos;
+
+
+
+* Todas as variáveis que compõem o modelo influenciam positivamente o resultado final;
+
+
+
+* A precisão de 0.75 no conjunto de testes é um bom resultado. No entanto, este resultado depende um pouco da divisão dos dados para treino/teste;
+
+
+A área abaixo da curva ROC com valor de 0.85 é considerado um valor bastante bom. 
+
+
+
+
+</div>
+
+
+
+
+
+
+
