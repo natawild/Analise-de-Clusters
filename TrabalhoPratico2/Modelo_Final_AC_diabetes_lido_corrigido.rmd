@@ -7,6 +7,31 @@ date: "`r format(Sys.Date(), '%d/%B/%Y')`"
 output: html_document
 ---
 
+```{r echo=FALSE}
+#Determine the output format of the document
+outputFormat   = opts_knit$get("rmarkdown.pandoc.to")
+
+#Figure and Table Caption Numbering, for HTML do it manually
+capTabNo = 1; capFigNo = 1;
+
+#Function to add the Table Number
+capTab = function(x){
+  if(outputFormat == 'html'){
+    x = paste0("Table ",capTabNo,". ",x)
+    capTabNo <<- capTabNo + 1
+  }; x
+}
+
+#Function to add the Figure Number
+capFig = function(x){
+  if(outputFormat == 'html'){
+    x = paste0("Figure ",capFigNo,". ",x)
+    capFigNo <<- capFigNo + 1
+  }; x
+}
+```
+
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
@@ -47,6 +72,9 @@ A tabela abaixo explica os valores de glicose 2 horas após a refeição.
 | 70 mg/dl a 140 mg/dl                          | normal       | 
 | 140 mg/dl a 199 mg/dl                         | pré-diabetes | 
 | superior 200 mg/dl                            | diabetes     | 
+
+
+r figA,fig.cap=capTab("My Figure Caption")
 
 
 ### Principais tipos de Diabetes 
@@ -105,7 +133,7 @@ A Organização Mundial de Saúde (OMS) classifica a obesidade de acordo com os 
 Existe uma relação entre o **Índice de Massa Corporal (IMC)** acima dos indicadores normais (18,5 a 24,9) e a **Diabetes Tipo 2**. A prevalência deste tipo de diabetes verifica-se em pessoas com IMC superior a 30. Este valor é cerca de quatro vezes superior ao das pessoas que se encontram dentro dos indicadores normais.  A prática de exercício físico regular tem sempre um papel positivo no controlo da diabetes. Esta rotina potencia a segregação de insulina e apoia o seu transporte até às células. Além disso, auxilia na redução de peso e na melhoria dos valores do IMC.
 
 
-$k_n^2$
+
 
 
 # Análise do *Dataset*
@@ -123,7 +151,7 @@ O *dataset* contém informação de 768 mulheres, das quais 268 foram diagnostic
 
 * **Insulin**: Insulina sérica de 2 horas (µU/ml); 
 
-* **BMI**: índice de massa corporal (IMC) (kg/m^2);
+* **BMI**: índice de massa corporal (IMC) ($kg/m^2$);
 
 * **DiabetesPedigreeFunction**: Função de hereditariedade da diabetes (uma função que pontua a possibilidade de diabetes com base no histórico familiar);
 
@@ -139,7 +167,7 @@ Uma variável dependente é uma medida que dependerá do valor de outra variáve
 
 ### **Variáveis Independentes**
 
-Uma variável independente é uma medida que não depende de nenhuma outra variável, sendo que existem 8 variáveis deste tipo no modelo. Foram consideradas variáveis tais como o número de gestações, a concentração de glicose no plasma (mg/dl) , a pressão sanguínea diastólica (mm Hg), a espessura da pele dos tríceps (mm), o nível de insulina (µU/ml), o índice de massa corporal (kg/m^2), a função de hereditariedade da diabetes e a idade em anos.
+Uma variável independente é uma medida que não depende de nenhuma outra variável, sendo que existem 8 variáveis deste tipo no modelo. Foram consideradas variáveis tais como o número de gestações, a concentração de glicose no plasma (mg/dl) , a pressão sanguínea diastólica (mm Hg), a espessura da pele dos tríceps (mm), o nível de insulina (µU/ml), o índice de massa corporal ($kg/m^2$), a função de hereditariedade da diabetes e a idade em anos.
 
 
 ### Criação da variável "*Outcome*" como fator 

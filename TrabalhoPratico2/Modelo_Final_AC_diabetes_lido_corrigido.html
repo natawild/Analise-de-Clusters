@@ -364,7 +364,7 @@ summary {
 
 <h1 class="title toc-ignore">Prediction of Diabetes in PIMA Women</h1>
 <h4 class="author">Grupo 4</h4>
-<h4 class="date">10/December/2019</h4>
+<h4 class="date">12/December/2019</h4>
 
 </div>
 
@@ -463,7 +463,6 @@ attach(diabetes)</code></pre>
 </tbody>
 </table>
 <p>Existe uma relação entre o <strong>Índice de Massa Corporal (IMC)</strong> acima dos indicadores normais (18,5 a 24,9) e a <strong>Diabetes Tipo 2</strong>. A prevalência deste tipo de diabetes verifica-se em pessoas com IMC superior a 30. Este valor é cerca de quatro vezes superior ao das pessoas que se encontram dentro dos indicadores normais. A prática de exercício físico regular tem sempre um papel positivo no controlo da diabetes. Esta rotina potencia a segregação de insulina e apoia o seu transporte até às células. Além disso, auxilia na redução de peso e na melhoria dos valores do IMC.</p>
-<p><span class="math inline">\(k_n^2\)</span></p>
 <h1 id="análise-do-dataset">Análise do <em>Dataset</em></h1>
 <p>O <em>dataset</em> contém informação de 768 mulheres, das quais 268 foram diagnosticadas com diabetes. As informações disponíveis incluem 8 variáveis, tais como Idade, Número de gestações, Glicose, Insulina, etc. Uma descrição mais detalhada sobre as variáveis está exposta nos pontos abaixo. A variável resposta no conjunto de dados é um classificador binário, <em>Outcome</em>, que indica se a pessoa foi diagnosticada com diabetes ou não.</p>
 <ul>
@@ -472,7 +471,7 @@ attach(diabetes)</code></pre>
 <li><p><strong>BloodPressure</strong>: Pressão sanguínea diastólica (mm Hg);</p></li>
 <li><p><strong>SkinThickness</strong>: Espessura da dobra da pele dos tríceps (mm);</p></li>
 <li><p><strong>Insulin</strong>: Insulina sérica de 2 horas (µU/ml);</p></li>
-<li><p><strong>BMI</strong>: índice de massa corporal (IMC) (kg/m^2);</p></li>
+<li><p><strong>BMI</strong>: índice de massa corporal (IMC) (<span class="math inline">\(kg/m^2\)</span>);</p></li>
 <li><p><strong>DiabetesPedigreeFunction</strong>: Função de hereditariedade da diabetes (uma função que pontua a possibilidade de diabetes com base no histórico familiar);</p></li>
 <li><p><strong>Age</strong>: Idade (anos)</p></li>
 <li><p><strong>Outcome</strong>: Variável de classe (0 se não diabético, 1 se diabético)</p></li>
@@ -480,7 +479,7 @@ attach(diabetes)</code></pre>
 <h3 id="variável-dependente"><strong>Variável dependente</strong></h3>
 <p>Uma variável dependente é uma medida que dependerá do valor de outra variável ou de um conjunto de variáveis. Na regressão logística, a variável dependente é dicotómica (<em>Outcome</em>), atribuindo-se o valor 1 ao acontecimento de ter diabetes e 0 ao acontecimento complementar, ou seja, esta variável define se o paciente possuí ou não a doença diabetes.</p>
 <h3 id="variáveis-independentes"><strong>Variáveis Independentes</strong></h3>
-<p>Uma variável independente é uma medida que não depende de nenhuma outra variável, sendo que existem 8 variáveis deste tipo no modelo. Foram consideradas variáveis tais como o número de gestações, a concentração de glicose no plasma (mg/dl) , a pressão sanguínea diastólica (mm Hg), a espessura da pele dos tríceps (mm), o nível de insulina (µU/ml), o índice de massa corporal (kg/m^2), a função de hereditariedade da diabetes e a idade em anos.</p>
+<p>Uma variável independente é uma medida que não depende de nenhuma outra variável, sendo que existem 8 variáveis deste tipo no modelo. Foram consideradas variáveis tais como o número de gestações, a concentração de glicose no plasma (mg/dl) , a pressão sanguínea diastólica (mm Hg), a espessura da pele dos tríceps (mm), o nível de insulina (µU/ml), o índice de massa corporal (<span class="math inline">\(kg/m^2\)</span>), a função de hereditariedade da diabetes e a idade em anos.</p>
 <h3 id="criação-da-variável-outcome-como-fator">Criação da variável “<em>Outcome</em>” como fator</h3>
 <p>Uma vez que no <em>dataset</em> em estudo a variável resposta se trata de uma binária (0 e 1), foi necessário cria um fator para a mesma.</p>
 <p>Para criar a variável como fator utilizou-se a função “factor”, na qual o único argumento necessário é um vetor de valores. O argumento “levels” determina as categorias da variável fator, sendo o padrão atribuido o correpondente: 0, ou seja, não possuir diabetes fica representado por “Não” e 1, ter diabetes, representado por “Sim”.</p>
